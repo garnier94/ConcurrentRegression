@@ -12,7 +12,7 @@
       <paths name="sftp://remy.garnier@a08datasc002.cdbdx.biz:22/home/CDBDX/remy.garnier/.virtualenvs/pred_3.6/bin/python3.6">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_794" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/CDBDX/remy.garnier/ConcurrentRegression" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
