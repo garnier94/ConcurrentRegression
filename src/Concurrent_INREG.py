@@ -11,7 +11,7 @@ class Concurrent_INREG(INREG_model):
         self.g = None
 
         def aux(X, t):
-            gX = self.g(X / (self.season[t-self.horizon] * weight))
+            gX = self.g([X[hist] / (self.season[t-self.horizon-hist] * weight) for hist in range(self.history)])
             weighted_sum = gX.dot(self.weight)
             return self.season[t] * self.weight * gX / weighted_sum
 
@@ -26,12 +26,11 @@ class Concurrent_INREG(INREG_model):
 class Concurrent_INAR(Concurrent_INREG):
     """ INAR(1) model"""
 
-    def __init__(self, shape = 1,  **kwargs):
+    def __init__(self,   **kwargs):
         Concurrent_INREG.__init__(self, **kwargs)
-        self.shape = 1
-        self.parameters = np.array([1 for i in range(shape)] + [0])
-        self.bound = [(1E-3,1E3) for i in range(shape+1)]
-        self.g = lambda x: self.parameters[0] * x + self.parameters[shape]
+        self.parameters = np.array([1 for i in range(self.history)] + [0])
+        self.bound = [(1E-3,1E3) for i in range(self.history+1)]
+        self.g = lambda x: sum( [self.parameters[hist] * x[hist]  for hist in range(self.history)])+ self.parameters[self.history]
 
 
 class Concurrent_log_INAR(Concurrent_INREG):
