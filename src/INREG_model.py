@@ -7,9 +7,10 @@ class INREG_model():
     """
     """
 
-    def __init__(self):
+    def __init__(self, horizon = 1):
         self.f = None
         self.parameters = None
+        self.horizon =horizon
 
     def log_likelihood(self, data):
         """
@@ -26,8 +27,8 @@ class INREG_model():
 
         vect_aux = np.vectorize(aux)
         current_log_likelihood = 0
-        for t in range(0, T - 1):
-            X_t, X_t1 = data[t, :], data[t + 1, :]
+        for t in range(0, T - self.horizon):
+            X_t, X_t1 = data[t, :], data[t + self.horizon, :]
             lambda_t = self.f(X_t,t)
             current_log_likelihood += sum(vect_aux(X_t1, lambda_t))
         return current_log_likelihood
@@ -39,7 +40,7 @@ class INREG_model():
         :return:
         """
         T, M = data.shape
-        return np.concatenate([self.f(data[t, :],t) for t in range(T)].reshape(T, M)
+        return np.concatenate([self.f(data[t, :],t) for t in range(T)]).reshape(T, M)
 
     def fit(self, mat, **kwargs):
         def aux(params):
