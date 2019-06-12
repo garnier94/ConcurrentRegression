@@ -1,6 +1,6 @@
 
 import  numpy as np
-from src.INREG_model import INREG_model
+from INREG_model import INREG_model
 
 
 class Concurrent_INREG(INREG_model):

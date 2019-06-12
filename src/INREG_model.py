@@ -39,7 +39,7 @@ class INREG_model():
         :return:
         """
         T, M = data.shape
-        return np.concatenate([self.f(data[t, :]) for t in range(T)],t).reshape(T, M)
+        return np.concatenate([self.f(data[t, :],t) for t in range(T)].reshape(T, M)
 
     def fit(self, mat, **kwargs):
         def aux(params):
