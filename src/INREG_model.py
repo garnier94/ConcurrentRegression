@@ -28,7 +28,7 @@ class INREG_model():
         current_log_likelihood = 0
         for t in range(0, T - 1):
             X_t, X_t1 = data[t, :], data[t + 1, :]
-            lambda_t = self.f(X_t)
+            lambda_t = self.f(X_t,t)
             current_log_likelihood += sum(vect_aux(X_t1, lambda_t))
         return current_log_likelihood
 
@@ -39,7 +39,7 @@ class INREG_model():
         :return:
         """
         T, M = data.shape
-        return np.concatenate([self.f(data[t, :]) for t in range(T)]).reshape(T, M)
+        return np.concatenate([self.f(data[t, :]) for t in range(T)],t).reshape(T, M)
 
     def fit(self, mat, **kwargs):
         def aux(params):
@@ -56,4 +56,4 @@ class INAR(INREG_model):
     def __init__(self):
         self.parameters = np.array([1, 0])
         self.bound = ((1e-10, 10), (0., 100))
-        self.f = lambda x: self.parameters[0] * x + self.parameters[1]
+        self.f = lambda x,t: self.parameters[0] * x + self.parameters[1]

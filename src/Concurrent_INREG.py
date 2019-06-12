@@ -9,12 +9,17 @@ class Concurrent_INREG(INREG_model):
         self.season = season
         self.g = None
 
-        def aux(X):
-            gX = self.g(X / self.season)
+        def aux(X, t):
+            gX = self.g(X / (self.season[t] * weight))
             weighted_sum = gX.dot(self.weight)
-            return self.season * self.weight * gX / weighted_sum
+            return self.season[t] * self.weight * gX / weighted_sum
 
         self.f = aux
+
+    def estim_weight(self,X, n):
+        """Estimation de poids normalisé"""
+        weight = X[:n,:].sum(axis=0)
+        self.weight = weight /sum(weight)
 
 
 class Concurrent_INAR(Concurrent_INREG):
