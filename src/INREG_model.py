@@ -68,7 +68,8 @@ class INREG_model():
 class INAR(INREG_model):
     """ INAR(1) model"""
 
-    def __init__(self):
-        self.parameters = np.array([1, 0])
-        self.bound = ((1e-10, 10), (0., 100))
-        self.f = lambda x, t, old: self.parameters[0] * x[0] + self.parameters[1]
+    def __init__(self, **kwargs):
+        INREG_model.__init__(self, **kwargs)
+        self.parameters = np.array([1 for i in range(self.history + 1)])
+        self.bound = [(1E-6, 1E5) for i in range(self.history + 1)]
+        self.f = lambda x, t, old: sum([self.parameters[hist] * x[hist] for hist in range(self.history)])+ self.parameters[self.history]

@@ -43,18 +43,22 @@ class Concurrent_INREG(INREG_model):
         M = X.shape[1]
         weight = np.ones(M)
         for ind_j in range(1, M):
+            print('New')
             num_csd = 0
 
             ecart = np.array([_find_max_intersection(X[:, ind_i], X[:, ind_j]) for ind_i in range(ind_j)])
             for ind_i in range(ind_j):
+
                 i_max, j_max = ecart[ind_i, 0], ecart[ind_i, 1]
                 if j_max - i_max > 4:
                     S_i = _sum_period(X[:, ind_i], (i_max + 1), (j_max - 1))
                     S_j = _sum_period(X[:, ind_j], (i_max + 1), (j_max - 1))
                     weight[ind_j] += weight[ind_i] * S_j / S_i
+                    print(weight[ind_i] * S_j / S_i)
                     num_csd += 1
             if num_csd > 0:
                 weight[ind_j] = weight[ind_j] / num_csd
+                print('Final : %s' % weight[ind_j])
         self.weight = weight
 
 
@@ -65,7 +69,7 @@ class Concurrent_INAR(Concurrent_INREG):
         Concurrent_INREG.__init__(self, **kwargs)
         csta = kwargs.get('cst', True)
         self.parameters = np.array([1 for i in range(self.history)])
-        self.bound = [(1E-3, 1E3) for i in range(self.history)]
+        self.bound = [(1E-6, 1E5) for i in range(self.history)]
         self.g = lambda x, old: sum([self.parameters[hist] * x[hist] for hist in range(self.history)]) + csta
 
 
@@ -75,7 +79,7 @@ class Concurrent_log_INAR(Concurrent_INREG):
     def __init__(self, **kwargs):
         Concurrent_INREG.__init__(self, **kwargs)
         self.parameters = np.array([1 for i in range(self.history)])
-        self.bound = [(1E-3, 1E3) for i in range(self.history)]
+        self.bound = [(1E-6, 1E5) for i in range(self.history)]
         self.g = lambda x, old: sum([self.parameters[hist] * np.log(1 + x[hist]) for hist in range(self.history)]) + 1
 
 
@@ -86,6 +90,6 @@ class Concurrent_INGARCH(Concurrent_INREG):
         Concurrent_INREG.__init__(self, **kwargs)
         cst = kwargs.get('cst', True)
         self.parameters = np.array([1 for i in range(self.history * 2)])
-        self.bound = [(1E-3, 1E3) for i in range(self.history * 2)]
+        self.bound = [(1E-6, 1E5) for i in range(self.history * 2)]
         self.g = lambda x, old: sum([self.parameters[hist] * x[hist] for hist in range(self.history)]) + cst + sum(
             [self.parameters[self.history + hist] * old[hist] for hist in range(self.history)])
