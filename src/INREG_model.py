@@ -65,7 +65,7 @@ class INREG_model():
         self.parameters = res.x
 
 
-class INAR(INREG_model):
+class INARCH(INREG_model):
     """ INAR(1) model"""
 
     def __init__(self, **kwargs):
@@ -73,3 +73,14 @@ class INAR(INREG_model):
         self.parameters = np.array([1 for i in range(self.history + 1)])
         self.bound = [(1E-6, 1E5) for i in range(self.history + 1)]
         self.f = lambda x, t, old: sum([self.parameters[hist] * x[hist] for hist in range(self.history)])+ self.parameters[self.history]
+
+
+class INGARCH(INREG_model):
+    """ INGARCH(p) model"""
+
+    def __init__(self, **kwargs):
+        INREG_model.__init__(self, **kwargs)
+        self.parameters = np.array([1 for i in range(self.history * 2)])
+        self.bound = [(1E-3, 1E2) for i in range(self.history * 2)]
+        self.f = lambda x, t, old: sum([self.parameters[hist] * x[hist] for hist in range(self.history)])  + sum(
+            [self.parameters[self.history + hist] * old[hist] for hist in range(self.history)]) + 1
