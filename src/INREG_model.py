@@ -7,11 +7,14 @@ class INREG_model():
     """
     """
 
-    def __init__(self, horizon=1, history=1,**kwargs):
+    def __init__(self, horizon=1, history=1,C =1, **kwargs):
         self.f = None
         self.parameters = None
         self.horizon = horizon
         self.history = history
+        self.regularizer = lambda x : 0
+        self._C = C
+
 
     def log_likelihood(self, data):
         """
@@ -29,8 +32,8 @@ class INREG_model():
                 return x
 
         vect_aux = np.vectorize(aux)
-        current_log_likelihood = 0
-        ###
+        current_log_likelihood = self._C * self.regularizer(self.parameters)
+
         old_lambda = [data[self.history - 1 - i, :] for i in range(self.history)]
 
         for t in range(self.history - 1, T - self.horizon):
