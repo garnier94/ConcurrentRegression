@@ -34,7 +34,7 @@ class Concurrent_INREG(INREG_model):
         def aux(X, t, old):
             gX = self.g([X[hist] / (self.season[t - self.horizon - hist] * weight) for hist in range(self.history)],
                         old)
-            weighted_sum = gX.dot(self.weight)
+            weighted_sum = max(1,gX.dot(self.weight))
             return self.season[t] * self.weight * gX / weighted_sum
 
         self.f = aux
@@ -43,7 +43,6 @@ class Concurrent_INREG(INREG_model):
         M = X.shape[1]
         weight = np.ones(M)
         for ind_j in range(1, M):
-            print('New')
             num_csd = 0
 
             ecart = np.array([_find_max_intersection(X[:, ind_i], X[:, ind_j]) for ind_i in range(ind_j)])
@@ -54,11 +53,9 @@ class Concurrent_INREG(INREG_model):
                     S_i = _sum_period(X[:, ind_i], (i_max + 1), (j_max - 1))
                     S_j = _sum_period(X[:, ind_j], (i_max + 1), (j_max - 1))
                     weight[ind_j] += weight[ind_i] * S_j / S_i
-                    print(weight[ind_i] * S_j / S_i)
                     num_csd += 1
             if num_csd > 0:
                 weight[ind_j] = weight[ind_j] / num_csd
-                print('Final : %s' % weight[ind_j])
         self.weight = weight
 
 
