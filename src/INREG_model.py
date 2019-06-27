@@ -10,6 +10,7 @@ class INREG_model():
     def __init__(self, horizon=1, history=1,C =1, **kwargs):
         self.f = None
         self.parameters = None
+        self.external_data = None
         self.horizon = horizon
         self.history = history
         self.regularizer = lambda x : 0
@@ -38,7 +39,10 @@ class INREG_model():
 
         for t in range(self.history - 1, T - self.horizon):
             X_t, X_t1 = [data[t - i, :] for i in range(self.history)], data[t + self.horizon, :]
-            lambda_t = self.f(X_t, t, old_lambda)
+            if self.external_data is None:
+                lambda_t = self.f(X_t, t, old_lambda)
+            else:
+                lambda_t = self.f(X_t, t, old_lambda, self.external_data)
             current_log_likelihood += sum(vect_aux(X_t1, lambda_t))
             old_lambda = [lambda_t] + old_lambda[:-1]
         return current_log_likelihood
@@ -54,7 +58,11 @@ class INREG_model():
         list_pred = list()
         old_lambda = [data[self.history - 1 - i, :] for i in range(self.history)]
         for t in range(self.history - 1, T):
-            new_lambda = self.f([data[t - hist, :] for hist in range(self.history)],t,old_lambda)
+
+            if self.external_data is None:
+                new_lambda = self.f([data[t - hist, :] for hist in range(self.history)],t,old_lambda)
+            else:
+                new_lambda = self.f([data[t - hist, :] for hist in range(self.history)], t, old_lambda, self.external_data)
             list_pred.append(new_lambda)
             old_lambda = [new_lambda] + old_lambda[:-1]
         return np.concatenate(list_pred).reshape(T-self.history + 1, M)
